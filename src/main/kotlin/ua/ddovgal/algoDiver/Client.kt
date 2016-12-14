@@ -4,60 +4,61 @@ import com.beust.jcommander.JCommander
 import ua.ddovgal.algoDiver.command.*
 import ua.ddovgal.algoDiver.graph.InputGraph
 import ua.ddovgal.algoDiver.scheduler.SampleScheduler
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 
 class Client {
 
-    private val inputGraph = InputGraph()
+    private val inputGraph by lazy {
+        try {
+            FileInputStream("algorithm.alg").use { ObjectInputStream(it).use { it.readObject() as InputGraph } }
+        } catch(e: Exception) {
+            InputGraph()
+        }
+    }
     private val sampleScheduler = SampleScheduler()
+    //TODO add pDiver
 
     fun interact() {
         val jc = JCommander()
-        while (true) {
-            val addNodeCommand = AddNodeCommand()
-            jc.addCommand("add", addNodeCommand)
-            val removeNodeCommand = RemoveNodeCommand()
-            jc.addCommand("remove", removeNodeCommand)
-            val linkNodesCommand = LinkNodesCommand()
-            jc.addCommand("link", linkNodesCommand)
-            val unlinkNodesCommand = UnlinkNodesCommand()
-            jc.addCommand("ulink", unlinkNodesCommand)
-            val sampleDiveCommand = SampleDiveCommand()
-            jc.addCommand("sdive", sampleDiveCommand)
-//        val progressiveDiveCommand = ProgressiveDiveCommand()
-//        jc.addCommand("pdive", progressiveDiveCommand)
+        jc.addCommand("show", ShowGraphCommand())
 
+        println("Enter commands with parameters")
+        while (true) {
             val line = readLine()
-            if (line == "exit") return
+            if (line == "exit") {
+                FileOutputStream("algorithm.alg").use { ObjectOutputStream(it).use { it.writeObject(inputGraph) } }
+                return
+            }
+
+            addNewCommands(jc)
 
             try {
                 jc.parse(*line!!.split(" ").toTypedArray())
+
+                val command = jc.commands[jc.parsedCommand]!!.objects[0] as Command
+                command.action(inputGraph)
             } catch(e: Exception) {
                 println(e.message)
             }
-
-            with(inputGraph) {
-                when (jc.parsedCommand) {
-                    "add" -> println("Added with id: ${add(addNodeCommand.leadTime)}")
-                    "remove" -> removeNode(removeNodeCommand.id)
-                    "link" -> {
-                        val fromNode = nodes.find { it.id == linkNodesCommand.fromId } ?: return@with
-                        val toNode = nodes.find { it.id == linkNodesCommand.toId } ?: return@with
-                        link(fromNode, toNode, linkNodesCommand.transferTime)
-                    }
-                    "ulink" -> {
-                        val fromNode = nodes.find { it.id == unlinkNodesCommand.fromId } ?: return@with
-                        val toNode = nodes.find { it.id == unlinkNodesCommand.toId } ?: return@with
-                        unlink(fromNode, toNode)
-                    }
-                    "sdive" -> {
-                        //TODO
-                        val system = System(sampleDiveCommand.processorsCount, inputGraph)
-//                        sampleScheduler.placeTasks(system)
-//                        system.showTimeLines()
-                    }
-                    else -> throw NoSuchMethodException()
-                }
-            }
         }
+    }
+
+    private fun addNewCommands(jc: JCommander) {
+        val addNodeCommand = AddNodeCommand()
+        jc.addCommand("add", addNodeCommand)
+        val removeNodeCommand = RemoveNodeCommand()
+        jc.addCommand("remove", removeNodeCommand)
+        val linkNodesCommand = LinkNodesCommand()
+        jc.addCommand("link", linkNodesCommand)
+        val unlinkNodesCommand = UnlinkNodesCommand()
+        jc.addCommand("ulink", unlinkNodesCommand)
+        val sampleDiveCommand = SampleDiveCommand()
+        jc.addCommand("sdive", sampleDiveCommand)
+        //TODO uncomment
+//        val progressiveDiveCommand = ProgressiveDiveCommand()
+//        jc.addCommand("pdive", progressiveDiveCommand)
     }
 }

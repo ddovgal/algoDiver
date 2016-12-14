@@ -1,9 +1,8 @@
 package ua.ddovgal.algoDiver
 
 import ua.ddovgal.algoDiver.architecture.Processor
-import ua.ddovgal.algoDiver.graph.InputGraph
 
-class System(processorsCount: Int, val inputGraph: InputGraph) {
+class System(processorsCount: Int) {
 
     val processors = Array(processorsCount, ::Processor)
 

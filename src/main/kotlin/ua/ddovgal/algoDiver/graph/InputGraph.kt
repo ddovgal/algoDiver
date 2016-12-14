@@ -1,6 +1,8 @@
 package ua.ddovgal.algoDiver.graph
 
-class InputGraph {
+import java.io.Serializable
+
+class InputGraph : Serializable {
 
     val nodes = mutableListOf<InputNode>()
     private var counter: Int = 1
