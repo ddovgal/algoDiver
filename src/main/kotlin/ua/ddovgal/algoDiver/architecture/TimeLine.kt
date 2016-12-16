@@ -1,23 +1,30 @@
 package ua.ddovgal.algoDiver.architecture
 
-import java.security.InvalidParameterException
+import ua.ddovgal.algoDiver.graph.InputNode
 
-class TimeLine<T> {
+class TimeLine {
 
-    class Interval<out T>(val started: Int, val finished: Int, val work: T)
+    class Interval(val started: Int, val finished: Int, val work: InputNode)
 
-    val intervalsOfWork = mutableListOf<Interval<T>>()
+    val intervalsOfWork = mutableListOf<Interval>()
 
     var endOfTime: Int = 0
 
-    fun addWork(started: Int, work: T, unpackTime: (T) -> Int) {
-        if (started >= endOfTime) throw InvalidParameterException()
-
+    fun addWork(started: Int, work: InputNode, unpackTime: (InputNode) -> Int) {
+        /*val workTime = unpackTime(work)
+        if (!isFreeAtInterval(started, started + workTime)) throw RuntimeException()
+        if (endOfTime < started + workTime) endOfTime = started + workTime*/
+        if (endOfTime >= started) throw RuntimeException()
         val workTime = unpackTime(work)
         endOfTime = started + workTime
 
         val newInterval = Interval(started, endOfTime, work)
         intervalsOfWork.add(newInterval)
+    }
+
+    fun smartPlaceTransferWork(from: Int, work: InputNode, time: Int): Interval {
+        //TODO
+        throw UnsupportedOperationException("Not implemented yet")
     }
 
     fun isFreeAtInterval(from: Int, to: Int): Boolean = intervalsOfWork.filter {

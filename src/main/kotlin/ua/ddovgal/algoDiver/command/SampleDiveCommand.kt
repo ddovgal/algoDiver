@@ -1,7 +1,7 @@
 package ua.ddovgal.algoDiver.command
 
 import com.beust.jcommander.Parameter
-import ua.ddovgal.algoDiver.System
+import ua.ddovgal.algoDiver.architecture.System
 import ua.ddovgal.algoDiver.graph.InputGraph
 
 class SampleDiveCommand : Command {
