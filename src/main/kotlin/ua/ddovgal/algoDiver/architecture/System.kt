@@ -15,7 +15,7 @@ class System(processorsCount: Int) {
     }
 
     /**
-     * @throws RuntimeException
+     * @throws RuntimeException if not all input nodes are immersed
      */
     fun addWorkForProcessor(work: InputNode, processorId: Int) {
         if (canBeImmerse(work)) {
@@ -27,6 +27,9 @@ class System(processorsCount: Int) {
 
     private fun canBeImmerse(work: InputNode) = work.inputLinks.map { it.first }.all { submergedNodes.contains(it) }
 
+    /**
+     * @throws RuntimeException if there is no processor, mapped with this [resultWorkTransfer]
+     */
     fun initTransfer(resultWorkTransfer: InputNode, to: Processor, transferTime: Int, initializer: InputNode): Int {
         val startPointProcessor = processors[submergedNodes[resultWorkTransfer] ?: throw RuntimeException()]
         return startPointProcessor.initTransfer(resultWorkTransfer, to, transferTime, initializer)

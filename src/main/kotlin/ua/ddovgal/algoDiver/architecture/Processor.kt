@@ -13,14 +13,27 @@ class Processor(val id: Int, val system: System) {
     fun addWork(node: InputNode) {
         val executionEOT = performTimeLine.endOfTime + 1
         val dataArrivalEOTs = node.inputLinks.map { system.initTransfer(it.first, this, it.second, node) }
-        val maxArrivalTime = dataArrivalEOTs.max()?.plus(1) ?: throw RuntimeException()
+        val maxArrivalTime = dataArrivalEOTs.max()?.plus(1) ?: 0
 
         val chosenStartTime = Math.max(executionEOT, maxArrivalTime)
         performTimeLine.addWork(chosenStartTime, node, { it.leadTime })
     }
 
-    //TODO делал полусонный - проверь метод и таймлайн и initTransfer в System
+    /**
+     * @throws RuntimeException if work/node, that need to be transferred, hadn't been executed at this processor and isn't in cache
+     */
     fun initTransfer(resultWorkTransfer: InputNode, to: Processor, transferTime: Int, initializer: InputNode): Int {
+        //first, check, if necessary work had been transferred to next processor before
+        //it means, that next processor already have it in cache
+        //so just need to init transfer from him
+        val transferToNextInterval = sendTimeLine.intervalsOfWork.find { it.work == resultWorkTransfer }
+
+        if (transferToNextInterval != null && to != this) {
+            val endOfSending = nextProcessor.initTransfer(resultWorkTransfer, to, transferTime, initializer)
+            return endOfSending
+        }
+
+
         val resultWorkInterval = performTimeLine.intervalsOfWork.find { it.work == resultWorkTransfer }
         val resultCachedInterval = receiveTimeLine.intervalsOfWork.find { it.work == resultWorkTransfer }
 
