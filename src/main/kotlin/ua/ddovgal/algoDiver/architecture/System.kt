@@ -25,7 +25,7 @@ class System(processorsCount: Int) {
         } else throw RuntimeException()
     }
 
-    private fun canBeImmerse(work: InputNode) = work.inputLinks.map { it.first }.all { submergedNodes.contains(it) }
+    fun canBeImmerse(work: InputNode) = work.inputLinks.map { it.first }.all { submergedNodes.contains(it) }
 
     /**
      * @throws RuntimeException if there is no processor, mapped with this [resultWorkTransfer]
@@ -34,4 +34,7 @@ class System(processorsCount: Int) {
         val startPointProcessor = processors[submergedNodes[resultWorkTransfer] ?: throw RuntimeException()]
         return startPointProcessor.initTransfer(resultWorkTransfer, to, transferTime, initializer)
     }
+
+    val latestWorkCompleteTime: Int
+        get() = processors.maxBy { it.performTimeLine.endOfTime }?.performTimeLine?.endOfTime ?: 0
 }

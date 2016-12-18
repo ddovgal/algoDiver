@@ -3,7 +3,6 @@ package ua.ddovgal.algoDiver
 import com.beust.jcommander.JCommander
 import ua.ddovgal.algoDiver.command.*
 import ua.ddovgal.algoDiver.graph.InputGraph
-import ua.ddovgal.algoDiver.scheduler.SampleScheduler
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.ObjectInputStream
@@ -18,8 +17,6 @@ class Client {
             InputGraph()
         }
     }
-    private val sampleScheduler = SampleScheduler()
-    //TODO add pDiver
 
     fun interact() {
         val jc = JCommander()
@@ -54,11 +51,8 @@ class Client {
         val linkNodesCommand = LinkNodesCommand()
         jc.addCommand("link", linkNodesCommand)
         val unlinkNodesCommand = UnlinkNodesCommand()
-        jc.addCommand("ulink", unlinkNodesCommand)
-        val sampleDiveCommand = SampleDiveCommand()
-        jc.addCommand("sdive", sampleDiveCommand)
-        //TODO uncomment
-//        val progressiveDiveCommand = ProgressiveDiveCommand()
-//        jc.addCommand("pdive", progressiveDiveCommand)
+        jc.addCommand("unlink", unlinkNodesCommand)
+        val immersionCommand = ImmersionCommand()
+        jc.addCommand("immerse", immersionCommand)
     }
 }

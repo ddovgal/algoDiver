@@ -4,7 +4,10 @@ import ua.ddovgal.algoDiver.graph.InputNode
 
 class TimeLine {
 
-    class Interval(val started: Int, val finished: Int, val work: InputNode)
+    class Interval(val started: Int, val finished: Int, val work: InputNode) {
+        val length: Int
+            get() = finished - started
+    }
 
     val intervalsOfWork = mutableListOf<Interval>()
 
@@ -14,10 +17,7 @@ class TimeLine {
      * @throws RuntimeException intended to add work before endOfTime(for performTimeLine)
      */
     fun addWork(started: Int, work: InputNode, unpackTime: (InputNode) -> Int) {
-        /*val workTime = unpackTime(work)
-        if (!isFreeAtInterval(started, started + workTime)) throw RuntimeException()
-        if (endOfTime < started + workTime) endOfTime = started + workTime*/
-        if (endOfTime >= started) throw RuntimeException()
+        if (endOfTime > started) throw RuntimeException()
         val workTime = unpackTime(work)
         endOfTime = started + workTime
 
@@ -32,37 +32,38 @@ class TimeLine {
      */
     fun smartPlaceTransferWork(from: Int, work: InputNode, time: Int): Interval {
         val firstWorkInterval = intervalsOfWork.find { it.finished >= from }
-        val startPointToPlaceWork: Int
+        var startPointToPlaceWork: Int
         val nextIntervalIndex: Int
 
         if (intervalsOfWork.isEmpty() || firstWorkInterval == null) {
-            startPointToPlaceWork = from + 1
+            startPointToPlaceWork = from
             nextIntervalIndex = -1
         } else if (firstWorkInterval.started <= from) {
             val indexOfThisInterval = intervalsOfWork.indexOf(firstWorkInterval)
-            startPointToPlaceWork = firstWorkInterval.finished + 1
+            startPointToPlaceWork = firstWorkInterval.finished
             nextIntervalIndex = if (intervalsOfWork.last() == firstWorkInterval) -1 else indexOfThisInterval + 1
         } else {
-            startPointToPlaceWork = from + 1
+            startPointToPlaceWork = from
             nextIntervalIndex = intervalsOfWork.indexOf(firstWorkInterval)
         }
 
         val windows = mutableListOf<Interval>()
 
-        //region Fix and check
         val fakeNode = InputNode(-1, -1)
         if (nextIntervalIndex != -1) {
             for (index in nextIntervalIndex..intervalsOfWork.lastIndex) {
                 val interval = intervalsOfWork[index]
-                windows.add(Interval(startPointToPlaceWork, interval.finished - 1, fakeNode))
+                windows.add(Interval(startPointToPlaceWork, interval.started, fakeNode))
+                startPointToPlaceWork = interval.finished
             }
+
         }
+        windows.add(Interval(startPointToPlaceWork, Int.MAX_VALUE, fakeNode))
 
-        throw UnsupportedOperationException("not implemented")
-        //endregion
+        val necessaryWindow = windows.first { it.length >= time }
+        val foundInterval = Interval(necessaryWindow.started, necessaryWindow.started + time, work)
+        intervalsOfWork.add(foundInterval)
+
+        return foundInterval
     }
-
-    fun isFreeAtInterval(from: Int, to: Int): Boolean = intervalsOfWork.filter {
-        (it.started <= to && it.finished >= to) || (it.started <= from && it.finished >= to)
-    }.isEmpty()
 }

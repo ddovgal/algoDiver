@@ -28,6 +28,6 @@ class InputGraph : Serializable {
 
     fun unlink(from: InputNode, to: InputNode) {
         from.outputLinks.removeAll { it.first == to }
-        from.inputLinks.removeAll { it.first == from }
+        to.inputLinks.removeAll { it.first == from }
     }
 }

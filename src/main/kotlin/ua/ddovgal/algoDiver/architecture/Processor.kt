@@ -11,9 +11,9 @@ class Processor(val id: Int, val system: System) {
     val sendTimeLine = TimeLine()
 
     fun addWork(node: InputNode) {
-        val executionEOT = performTimeLine.endOfTime + 1
+        val executionEOT = performTimeLine.endOfTime
         val dataArrivalEOTs = node.inputLinks.map { system.initTransfer(it.first, this, it.second, node) }
-        val maxArrivalTime = dataArrivalEOTs.max()?.plus(1) ?: 0
+        val maxArrivalTime = dataArrivalEOTs.max() ?: 0
 
         val chosenStartTime = Math.max(executionEOT, maxArrivalTime)
         performTimeLine.addWork(chosenStartTime, node, { it.leadTime })
