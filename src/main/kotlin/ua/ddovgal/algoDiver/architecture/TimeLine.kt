@@ -30,7 +30,7 @@ class TimeLine {
      * WARNING ! You must add work in this method, not just return interval. Because adding this interval to
      * the time line (sendTimeLine) by [addWork] method is not correct(possible [RuntimeException]s)
      */
-    fun smartPlaceTransferWork(from: Int, work: InputNode, time: Int): Interval {
+    fun smartPlaceTransferWork(from: Int, work: InputNode, time: Int, onlyWatch: Boolean = false): Interval {
         val firstWorkInterval = intervalsOfWork.find { it.finished >= from }
         var startPointToPlaceWork: Int
         val nextIntervalIndex: Int
@@ -62,7 +62,7 @@ class TimeLine {
 
         val necessaryWindow = windows.first { it.length >= time }
         val foundInterval = Interval(necessaryWindow.started, necessaryWindow.started + time, work)
-        intervalsOfWork.add(foundInterval)
+        if (!onlyWatch) intervalsOfWork.add(foundInterval)
 
         return foundInterval
     }

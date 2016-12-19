@@ -30,9 +30,9 @@ class System(processorsCount: Int) {
     /**
      * @throws RuntimeException if there is no processor, mapped with this [resultWorkTransfer]
      */
-    fun initTransfer(resultWorkTransfer: InputNode, to: Processor, transferTime: Int, initializer: InputNode): Int {
+    fun initTransfer(resultWorkTransfer: InputNode, to: Processor, transferTime: Int, initializer: InputNode, onlyWatch: Boolean = false): Int {
         val startPointProcessor = processors[submergedNodes[resultWorkTransfer] ?: throw RuntimeException()]
-        return startPointProcessor.initTransfer(resultWorkTransfer, to, transferTime, initializer)
+        return startPointProcessor.initTransfer(resultWorkTransfer, to, transferTime, initializer, onlyWatch)
     }
 
     val latestWorkCompleteTime: Int
