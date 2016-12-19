@@ -2,18 +2,24 @@ package ua.ddovgal.algoDiver.gantt
 
 import ua.ddovgal.algoDiver.architecture.System
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Rectangle
 import javax.swing.JComponent
 import javax.swing.JFrame
+import javax.swing.JScrollPane
 
 
 class GanttFrame(system: System) : JFrame("Gantt diagram") {
 
     init {
         defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
-        setBounds(30, 30, 300, 500)
-        contentPane.add(GanttDiagram(system))
+
+        val ganttDiagram = GanttDiagram(system)
+        val jScrollPane = JScrollPane(ganttDiagram)
+
+        size = Dimension(Math.min(ganttDiagram.width + 30, 1000), Math.min(ganttDiagram.height + 33, 900))
+        contentPane.add(jScrollPane)
         isVisible = true
     }
 
@@ -22,11 +28,14 @@ class GanttFrame(system: System) : JFrame("Gantt diagram") {
         private val TIC_HEIGHT = 20
         private val TIC_WIDTH = 30
         private val BORDERS_PADDING = 40
-        private val TEXT_PADDING = 20
         private val TEXT_HEIGHT = 20
 
         private val processorsNumber = system.processors.count()
         private val ticsCount = system.latestWorkCompleteTime
+
+        override fun getWidth() = 2 * BORDERS_PADDING + processorsNumber * 3 * TIC_WIDTH
+        override fun getHeight() = 2 * BORDERS_PADDING + ticsCount * TIC_HEIGHT + TEXT_HEIGHT * 2
+        override fun getPreferredSize() = Dimension(width, height)
 
         override fun paint(g: Graphics) {
             drawSkeleton(g)
@@ -112,5 +121,4 @@ class GanttFrame(system: System) : JFrame("Gantt diagram") {
             drawStringCentred(g, rect, text)
         }
     }
-
 }

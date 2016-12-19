@@ -30,4 +30,10 @@ class InputGraph : Serializable {
         from.outputLinks.removeAll { it.first == to }
         to.inputLinks.removeAll { it.first == from }
     }
+
+    val levels: Map<Int, List<InputNode>>
+        get() = nodes.groupBy { it.level }.toSortedMap()
+
+    val maxLevelSize: Int
+        get() = levels.values.maxBy { it.count() }?.count() ?: throw RuntimeException()
 }

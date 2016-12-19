@@ -10,13 +10,14 @@ class Processor(val id: Int, val system: System) {
     val performTimeLine = TimeLine()
     val sendTimeLine = TimeLine()
 
-    fun addWork(node: InputNode) {
+    fun addWork(node: InputNode): Int {
         val executionEOT = performTimeLine.endOfTime
         val dataArrivalEOTs = node.inputLinks.map { system.initTransfer(it.first, this, it.second, node) }
         val maxArrivalTime = dataArrivalEOTs.max() ?: 0
 
         val chosenStartTime = Math.max(executionEOT, maxArrivalTime)
         performTimeLine.addWork(chosenStartTime, node, { it.leadTime })
+        return chosenStartTime
     }
 
     /**
@@ -45,7 +46,7 @@ class Processor(val id: Int, val system: System) {
         val endOfSending: Int
         if (to != this) {
             val foundSendingInterval = sendTimeLine.smartPlaceTransferWork(resultAvailablePoint, resultWorkTransfer, transferTime)
-            nextProcessor.receiveTimeLine.addWork(foundSendingInterval.started, resultWorkTransfer, { transferTime })
+            nextProcessor.receiveTimeLine.intervalsOfWork.add(TimeLine.Interval(foundSendingInterval.started, foundSendingInterval.finished, foundSendingInterval.work))
             endOfSending = nextProcessor.initTransfer(resultWorkTransfer, to, transferTime, initializer)
         } else endOfSending = resultAvailablePoint
 
