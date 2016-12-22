@@ -7,6 +7,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.util.*
 
 class Client {
 
@@ -25,9 +26,12 @@ class Client {
         println("Enter commands with parameters")
         while (true) {
             val line = readLine()
-            if (line == "exit") {
-                FileOutputStream("algorithm.alg").use { ObjectOutputStream(it).use { it.writeObject(inputGraph) } }
-                return
+            when (line) {
+                "exit" -> {
+                    FileOutputStream("algorithm.alg").use { ObjectOutputStream(it).use { it.writeObject(inputGraph) } }
+                    return
+                }
+                "shuffle" -> Collections.shuffle(inputGraph.nodes)
             }
 
             addNewCommands(jc)

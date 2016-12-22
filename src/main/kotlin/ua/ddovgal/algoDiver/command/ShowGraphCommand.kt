@@ -4,7 +4,9 @@ import ua.ddovgal.algoDiver.graph.InputGraph
 
 class ShowGraphCommand : Command {
     override fun InputGraph.graphAction() {
-        nodes.forEach {
+        val sortedNodes = nodes
+        sortedNodes.sortBy { it.level }
+        sortedNodes.forEach {
             print("(${it.level}) T${it.id}[${it.leadTime}] -> {")
             val sb = StringBuilder()
             it.outputLinks.forEachIndexed { i, pair ->
